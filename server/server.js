@@ -7,10 +7,13 @@ var app = express();
 app.use(bodyparser.json());
 
 app.get('/', (request, response) => {
-  response.send('succes' + db.name);
+  response.send('succes ');
 });
 
-app.listen(3000, () => {
+
+
+
+let server = app.listen(3000, () => {
   console.log('started server on port 3000');
 })
 
