@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyparser = require('body-parser');
+const user = require('./user');
 
 var app = express();
 
@@ -9,15 +10,12 @@ app.get('/', (request, response) => {
   response.send('succes ');
 });
 
-app.get('/users/:id', (request, response) => {
-  var id = parseInt(request.params.id, 10);
-  if(id !== id) {
-    response.send({error: 'Invalid id'});
-    return;
-  }
-  
-    
-});
+app.post('/users/', user.create);
+app.get('/users', user.get);
+app.get('/users/:id', user.getById);
+app.delete('/users/:id', user.delete);
+
+
 
 
 let server = app.listen(3000, () => {
