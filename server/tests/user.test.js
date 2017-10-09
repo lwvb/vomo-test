@@ -4,6 +4,15 @@ const request = require('supertest');
 const app = require('./../server');
 const db = require('./../db/lokijs');
 
+function seedDb() {
+  let testUsers = []
+  
+  testUsers.push(db.insert({name: 'test user 1'}, 'user'));
+  testUsers.push(db.insert({name: 'test user 2'}, 'user'));
+  testUsers.push(db.insert({name: 'test user 3'}, 'user'));
+  
+  return testUsers;
+}
 
 
 beforeEach((done) => {
@@ -62,11 +71,7 @@ describe('Get /users', () => {
   });
 
   it('should return all the users', (done) => {
-    let testUsers = []
-
-    testUsers.push(db.insert({name: 'test user 1'}, 'user'));
-    testUsers.push(db.insert({name: 'test user 2'}, 'user'));
-    testUsers.push(db.insert({name: 'test user 3'}, 'user'));
+    let testUsers = seedDb();
     
     request(app)
       .get('/users')
@@ -89,11 +94,7 @@ describe('Get /users/:id', () => {
   });
 
   it('should return the user with given id', (done) => {
-    let testUsers = []
-
-    testUsers.push(db.insert({name: 'test user 1'}, 'user'));
-    testUsers.push(db.insert({name: 'test user 2'}, 'user'));
-    testUsers.push(db.insert({name: 'test user 3'}, 'user'));
+    let testUsers = seedDb();
     
     request(app)
       .get('/users/'+testUsers[1].id)
@@ -124,11 +125,7 @@ describe('delete /users/:id', () => {
   });
 
   it('should remove the user with given id', (done) => {
-    let testUsers = []
-
-    testUsers.push(db.insert({name: 'test user 1'}, 'user'));
-    testUsers.push(db.insert({name: 'test user 2'}, 'user'));
-    testUsers.push(db.insert({name: 'test user 3'}, 'user'));
+    let testUsers = seedDb();
     
     request(app)
       .delete('/users/'+testUsers[1].id)
