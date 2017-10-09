@@ -10,16 +10,10 @@ app.get('/', (request, response) => {
   response.send('succes ');
 });
 
-app.post('/users/', user.create);
+app.post('/users', user.create);
 app.get('/users', user.get);
 app.get('/users/:id', user.getById);
 app.delete('/users/:id', user.delete);
 
 
-
-
-let server = app.listen(3000, () => {
-  console.log('started server on port 3000');
-})
-
-module.exports = { app };
+module.exports = app;
