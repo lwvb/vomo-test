@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyparser = require('body-parser');
-const db = require('./db/orientdb');
 
 var app = express();
 
@@ -10,7 +9,15 @@ app.get('/', (request, response) => {
   response.send('succes ');
 });
 
-
+app.get('/users/:id', (request, response) => {
+  var id = parseInt(request.params.id, 10);
+  if(id !== id) {
+    response.send({error: 'Invalid id'});
+    return;
+  }
+  
+    
+});
 
 
 let server = app.listen(3000, () => {
