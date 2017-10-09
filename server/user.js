@@ -43,7 +43,18 @@ User.get = function(request, response) {
 }
 
 User.delete = function(request, response)  {
-  response.status(501).send({ error: 'method not implemented'});
+  const id = request.params.id;
+  if(!_isValidId(id)) {
+    response.status(400).send({ error: 'invalid id'});
+    return;
+  }
+
+  const user = db.remove(id, 'user')
+  if(user) {
+    response.send(user);
+  } else {
+    response.status(404).send({ error: 'no user with given id'})
+  }
 }
 
   

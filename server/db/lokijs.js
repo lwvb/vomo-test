@@ -26,6 +26,15 @@ function get(objectId, collection) {
   return _transform(result);
 }
 
+function remove(objectId, collection) {
+  object = getCollection(collection).get(objectId);
+  if(!object) {
+    return;
+  }
+  result = getCollection(collection).remove(object);
+  return _transform(result);
+}
+
 /**
  * Create a new object from the lokijs object
  * It is not possible to modify the loki object because it tracks changes
@@ -50,4 +59,4 @@ function _transform(dbObject) {
 }
 
 
-module.exports = { useDb, getCollection, insert, getAll, get };
+module.exports = { useDb, getCollection, insert, getAll, get, remove };

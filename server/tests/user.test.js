@@ -113,3 +113,45 @@ describe('Get /users/:id', () => {
      .end(done);
   });
 });
+
+
+describe('delete /users/:id', () => {
+  it('should return a 404 not found for when there is no user with given id', (done) => {
+    request(app)
+      .delete('/users/0')
+      .expect(404)
+      .end(done);
+  });
+
+  it('should remove the user with given id', (done) => {
+    let testUsers = []
+
+    testUsers.push(db.insert({name: 'test user 1'}, 'user'));
+    testUsers.push(db.insert({name: 'test user 2'}, 'user'));
+    testUsers.push(db.insert({name: 'test user 3'}, 'user'));
+    
+    request(app)
+      .delete('/users/'+testUsers[1].id)
+      .expect(200)
+      .expect((response) => {
+        expect(response.body).toEqual({name: 'test user 2'});
+      })
+      .end((error, response) => {
+        if(error) {
+          done(error);
+          return;
+        }
+        
+        expect(db.getCollection('user').get(testUsers[1].id)).toBe(null);
+        done();
+      });
+  });
+
+  
+  it('should return an error for an invalid id', (done) => {
+    request(app)
+     .delete('/users/a')
+     .expect(400)
+     .end(done);
+  });
+});
