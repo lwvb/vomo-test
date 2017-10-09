@@ -47,5 +47,69 @@ describe('Post /user', () => {
        expect(db.getCollection('user').find().length).toBe(0);
        done();
      });
- })
+  });
+});
+
+describe('Get /users', () => {
+  it('should return an empty list when there are no users', (done) => {
+    request(app)
+      .get('/users')
+      .expect(200)
+      .expect((response) => {
+        expect(response.body).toEqual([]);
+      })
+      .end(done);
+  });
+
+  it('should return all the users', (done) => {
+    let testUsers = []
+
+    testUsers.push(db.insert({name: 'test user 1'}, 'user'));
+    testUsers.push(db.insert({name: 'test user 2'}, 'user'));
+    testUsers.push(db.insert({name: 'test user 3'}, 'user'));
+    
+    request(app)
+      .get('/users')
+      .expect(200)
+      .expect((response) => {
+        expect(response.body).toEqual(testUsers);
+      })
+      .end(done);
+     
+  });
+});
+
+
+describe('Get /users/:id', () => {
+  it('should return a 404 not found for when there is no user with given id', (done) => {
+    request(app)
+      .get('/users/0')
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return the user with given id', (done) => {
+    let testUsers = []
+
+    testUsers.push(db.insert({name: 'test user 1'}, 'user'));
+    testUsers.push(db.insert({name: 'test user 2'}, 'user'));
+    testUsers.push(db.insert({name: 'test user 3'}, 'user'));
+    
+    request(app)
+      .get('/users/'+testUsers[1].id)
+      .expect(200)
+      .expect((response) => {
+        expect(response.body).toEqual(testUsers[1]);
+      })
+      .end(done);
+     
+  });
+
+  
+  it('should return an error for an invalid id', (done) => {
+    request(app)
+     .get('/users/a')
+     .expect(400)
+     .end(done);
+  });
 });
