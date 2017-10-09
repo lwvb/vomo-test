@@ -1,20 +1,19 @@
-var loki = require('lokijs');
+var loki = require("lokijs");
 
-var db = new loki('db');
+var db = new loki("db");
 
 function useDb(name) {
   db = new loki(name);
 }
 
 function getCollection(name) {
-	return db.getCollection(name) || db.addCollection(name);
+  return db.getCollection(name) || db.addCollection(name);
 }
 
 function insert(object, collection) {
   result = getCollection(collection).insert(object);
   return transform(result);
 }
-
 
 function getAll(collection) {
   results = getCollection(collection).find({});
@@ -28,7 +27,7 @@ function get(objectId, collection) {
 
 function remove(objectId, collection) {
   object = getCollection(collection).get(objectId);
-  if(!object) {
+  if (!object) {
     return;
   }
   result = getCollection(collection).remove(object);
@@ -42,28 +41,35 @@ function remove(objectId, collection) {
  * @param {object} dbObject
  */
 function transform(dbObject) {
-  if(!dbObject) {
+  if (!dbObject) {
     return;
   }
   let newObject = {};
   Object.keys(dbObject).forEach(key => {
     value = dbObject[key];
-    if(Array.isArray(value)) {
+    if (Array.isArray(value)) {
       value = value.map(transform);
-    } else if(value === Object(value)) {
+    } else if (value === Object(value)) {
       value = transform(value);
     }
 
-    if(key === '$loki') {
+    if (key === "$loki") {
       newObject.id = value;
-    } else if(key === 'meta' || key === 'id'){
+    } else if (key === "meta" || key === "id") {
       //skip
     } else {
       newObject[key] = value;
-    }    
+    }
   });
   return newObject;
 }
 
-
-module.exports = { useDb, getCollection, insert, getAll, get, remove, transform };
+module.exports = {
+  useDb,
+  getCollection,
+  insert,
+  getAll,
+  get,
+  remove,
+  transform
+};
