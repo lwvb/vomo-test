@@ -12,18 +12,18 @@ function getCollection(name) {
 
 function insert(object, collection) {
   result = getCollection(collection).insert(object);
-  return _transform(result);
+  return transform(result);
 }
 
 
 function getAll(collection) {
   results = getCollection(collection).find({});
-  return results.map(_transform);
+  return results.map(transform);
 }
 
 function get(objectId, collection) {
   result = getCollection(collection).get(objectId);
-  return _transform(result);
+  return transform(result);
 }
 
 function remove(objectId, collection) {
@@ -32,31 +32,38 @@ function remove(objectId, collection) {
     return;
   }
   result = getCollection(collection).remove(object);
-  return _transform(result);
+  return transform(result);
 }
 
 /**
  * Create a new object from the lokijs object
  * It is not possible to modify the loki object because it tracks changes
- * Rewrites the $loki id to id property
+ * Rewrites the $loki id to id property and removes metadata
  * @param {object} dbObject
  */
-function _transform(dbObject) {
+function transform(dbObject) {
   if(!dbObject) {
     return;
   }
   let newObject = {};
   Object.keys(dbObject).forEach(key => {
+    value = dbObject[key];
+    if(Array.isArray(value)) {
+      value = value.map(transform);
+    } else if(value === Object(value)) {
+      value = transform(value);
+    }
+
     if(key === '$loki') {
-      newObject.id = dbObject[key];
+      newObject.id = value;
     } else if(key === 'meta' || key === 'id'){
       //skip
     } else {
-      newObject[key] = dbObject[key];
+      newObject[key] = value;
     }    
   });
   return newObject;
 }
 
 
-module.exports = { useDb, getCollection, insert, getAll, get, remove };
+module.exports = { useDb, getCollection, insert, getAll, get, remove, transform };

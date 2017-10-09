@@ -16,6 +16,8 @@ app.get('/users', user.get);
 app.get('/users/:id', user.getById);
 app.delete('/users/:id', user.delete);
 
+app.post('/users/:id/like', user.like);
+app.delete('/users/:id/like/:projectid', user.unlike);
 
 app.post('/projects', project.create);
 app.get('/projects', project.get);

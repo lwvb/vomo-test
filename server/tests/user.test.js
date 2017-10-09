@@ -19,7 +19,7 @@ beforeEach((done) => {
   db.useDb('test-db');
   db.getCollection('user').chain().remove();
   done();
-})
+});
 
 
 describe('Post /user', () => {

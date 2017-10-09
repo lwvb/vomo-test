@@ -7,7 +7,23 @@ function _isValidName(name) {
 }
 
 function _isValidId(id) {
-  return id.match(/^\d+$/);
+  return ((typeof id === 'number' && id === Math.floor(id)) || (typeof id === 'string' && id.match(/^\d+$/)));
+}
+
+function _hasLiked(user, projectid) {
+  return user.likes && user.likes.find(project => {
+    return project['$loki'] === projectid;
+  })
+}
+
+function _removeLike(user, projectid) {
+  user.likes = user.likes.reduce((likes, current) => {
+    console.log(likes);
+    if(current['$loki'] !== projectid) {
+      likes.push(current);
+    }
+    return likes;
+  }, []);
 }
 
 
@@ -38,7 +54,7 @@ User.getById = function(request, response) {
 }
 
 User.get = function(request, response) {
-  const users = db.getAll('user')
+  const users = db.getAll('user');
   response.send(users);
 }
 
@@ -57,6 +73,50 @@ User.delete = function(request, response)  {
   }
 }
 
-  
+User.like = function(request, response) {
+  const id = request.params.id;
+  const projectid = parseInt(request.body.project, 10);
+  if(!_isValidId(id) || !_isValidId(projectid)) {
+    response.status(400).send({ error: 'invalid id'});
+    return;
+  }
 
+  const user = db.getCollection('user').get(id);
+  const project = db.getCollection('project').get(projectid);
+  if(!user) {
+    response.status(404).send({ error: 'no user or project with given id'});
+  } else if (!project) {
+    response.status(400).send({ error: 'invalid project id'});
+  } else {
+    if(user.likes === undefined) {
+      user.likes = [];
+    }
+    if(!_hasLiked(user, projectid)) {
+      user.likes.push(project);
+    }
+    response.send(db.transform(user));
+  }
+}  
+
+User.unlike = function(request, response) {
+  const id = request.params.id;
+  const projectid = parseInt(request.params.projectid, 10);
+  if(!_isValidId(id) || !_isValidId(projectid)) {
+    response.status(400).send({ error: 'invalid id'});
+    return;
+  }
+
+  const user = db.getCollection('user').get(id);
+  if(!user) {
+    response.status(404).send({ error: 'no user with given id'});
+    return;
+  }
+  
+  if(!_hasLiked(user, projectid)) {
+    response.status(404).send({ error: 'no like with given project id'});
+  } else {
+    _removeLike(user, projectid);
+    response.send(db.transform(user));
+  }
+} 
 module.exports = User;
